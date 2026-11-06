@@ -20,6 +20,24 @@ export function PayRequest({
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [person, setPerson] = useState<Person | null>(null);
+  const [query, setQuery] = useState("");
+  const q = query.trim();
+  const qLower = q.toLowerCase().replace(/^@/, "");
+  const matches = q
+    ? people.filter((p) => p.name.toLowerCase().includes(qLower) || p.handle.toLowerCase().includes(qLower))
+    : people;
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(q);
+  const isPhone = !isEmail && /^\+?[\d\s().-]{7,}$/.test(q) && q.replace(/\D/g, "").length >= 7;
+  const isHandle = !isEmail && !isPhone && q.startsWith("@") && q.length > 1;
+  const typedPerson: Person | null = !q
+    ? null
+    : isEmail
+      ? { name: q, handle: "Email" }
+      : isPhone
+        ? { name: q, handle: "Phone number" }
+        : isHandle
+          ? { name: q.slice(1), handle: q }
+          : { name: q, handle: "Name" };
 
   useEffect(() => {
     if (person) return;
@@ -53,6 +71,12 @@ export function PayRequest({
             ref={input}
             type="search"
             enterKeyHint="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== "Enter" || !typedPerson) return;
+              setPerson(matches[0] && !isEmail && !isPhone ? matches[0] : typedPerson);
+            }}
             placeholder="Name, @username, phone, or email"
             aria-label="Name, @username, phone, or email"
             className="min-w-0 flex-1 text-ellipsis bg-transparent text-[0.95rem] text-foreground caret-brand outline-none placeholder:text-subtle/70"
@@ -64,6 +88,26 @@ export function PayRequest({
       </header>
 
       <div className="flex-1 overflow-y-auto pb-8">
+        {typedPerson && (
+          <ul className="mt-2">
+            <li>
+              <button
+                onClick={() => setPerson(typedPerson)}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left active:bg-muted"
+              >
+                <Avatar person={{ name: typedPerson.name, handle: typedPerson.handle }} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[0.95rem] text-foreground/80">{typedPerson.name}</span>
+                  <span className="block truncate text-sm text-subtle/80">
+                    {isEmail || isPhone ? `Send to ${typedPerson.handle.toLowerCase()}` : `Send to "${q}"`}
+                  </span>
+                </span>
+              </button>
+            </li>
+          </ul>
+        )}
+
+        {!q && (
         <ul className="mt-2 px-4">
           <li className="border-b border-border/70">
             <button className="flex w-full items-center gap-4 py-3.5 text-left active:opacity-70">
@@ -87,10 +131,15 @@ export function PayRequest({
             </button>
           </li>
         </ul>
+        )}
 
-        <h2 className="mt-3 px-4 text-[0.95rem] font-semibold text-foreground/80">Top people</h2>
+        {matches.length > 0 && (
+          <h2 className="mt-3 px-4 text-[0.95rem] font-semibold text-foreground/80">
+            {q ? "People" : "Top people"}
+          </h2>
+        )}
         <ul className="mt-2">
-          {people.map((p) => (
+          {matches.map((p) => (
             <li key={p.handle}>
               <button
                 onClick={() => setPerson(p)}
