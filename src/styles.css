@@ -1,0 +1,304 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Venmo recreation design system.
+ * All colors are oklch tokens; components only use the semantic utilities.
+ */
+
+@theme inline {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Figtree", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Venmo brand tokens */
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-screen: var(--screen);
+  --color-field: var(--field);
+  --color-field-border: var(--field-border);
+  --color-subtle: var(--subtle);
+  --color-overlay: var(--overlay);
+  --color-teal: var(--teal);
+  --color-bubble: var(--bubble);
+  --color-bofa: var(--bofa);
+  --color-huntington: var(--huntington);
+  --color-badge: var(--badge);
+  --color-scrim: var(--scrim);
+  --color-go: var(--go);
+  --color-go-foreground: var(--go-foreground);
+  --color-minus: var(--minus);
+  --color-mc-red: var(--mc-red);
+  --color-mc-orange: var(--mc-orange);
+  --color-arb: var(--arb);
+  --color-ulta: var(--ulta);
+  --color-lulu: var(--lulu);
+  --color-target: var(--target);
+  --color-success: var(--success);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --brand: oklch(0.64 0.195 252);
+  --brand-foreground: oklch(0.99 0.003 240);
+  --ink: oklch(0.16 0.01 260);
+  --ink-foreground: oklch(0.99 0 0);
+  --screen: oklch(0.985 0.004 240);
+  --field: oklch(0.99 0.002 240);
+  --field-border: oklch(0.92 0.006 250);
+  --subtle: oklch(0.6 0.012 255);
+  --overlay: oklch(0.3 0.02 250 / 0.45);
+  --teal: oklch(0.72 0.11 175);
+  --bubble: oklch(0.72 0.15 250);
+  --bofa: oklch(0.55 0.21 25);
+  --huntington: oklch(0.6 0.16 140);
+  --badge: oklch(0.55 0.2 22);
+  --scrim: oklch(0.15 0.01 260 / 0.6);
+  --go: oklch(0.6 0.11 170);
+  --go-foreground: oklch(0.99 0 0);
+  --promo-from: oklch(0.6 0.2 15);
+  --promo-via: oklch(0.58 0.2 300);
+  --promo-to: oklch(0.6 0.18 255);
+  --minus: oklch(0.63 0.2 15);
+  --mc-red: oklch(0.6 0.23 28);
+  --mc-orange: oklch(0.78 0.17 70);
+  --arb: oklch(0.55 0.14 245);
+  --ulta: oklch(0.7 0.17 45);
+  --lulu: oklch(0.55 0.21 25);
+  --target: oklch(0.56 0.23 27);
+  --success: oklch(0.62 0.16 150);
+  --holo-a: oklch(0.8 0.12 220);
+  --holo-b: oklch(0.78 0.13 320);
+  --holo-c: oklch(0.82 0.11 200);
+  --holo-d: oklch(0.88 0.15 110);
+  --sol-a: oklch(0.7 0.25 320);
+  --sol-b: oklch(0.82 0.17 165);
+
+  --background: var(--screen);
+  --foreground: oklch(0.22 0.015 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.015 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.015 260);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --secondary: oklch(0.96 0.006 250);
+  --secondary-foreground: oklch(0.22 0.015 260);
+  --muted: oklch(0.95 0.006 250);
+  --muted-foreground: oklch(0.55 0.015 255);
+  --accent: oklch(0.95 0.02 250);
+  --accent-foreground: oklch(0.22 0.015 260);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.92 0.006 250);
+  --input: oklch(0.92 0.006 250);
+  --ring: var(--brand);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    background-color: var(--color-screen);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-soft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@utility animate-screen-in {
+  animation: screen-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@utility animate-fade-soft {
+  animation: fade-in-soft 0.4s ease-out both;
+}
+
+@utility animate-pop-in {
+  animation: pop-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes push-in {
+  from {
+    opacity: 0.6;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@utility animate-push-in {
+  animation: push-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0.4;
+    transform: translateY(40%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-slide-up {
+  animation: slide-up 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@utility animate-sheet-up {
+  animation: sheet-up 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes caret-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  95% {
+    opacity: 0;
+  }
+}
+
+@utility animate-caret {
+  animation: caret-blink 1.05s step-end infinite;
+}
+
+@utility bg-promo {
+  background-image: linear-gradient(100deg, var(--promo-from), var(--promo-via) 40%, var(--promo-to));
+}
+
+@utility tracking-display {
+  letter-spacing: -0.045em;
+}
+
+@utility bg-holo {
+  background-image:
+    radial-gradient(circle at 30% 70%, var(--holo-b), transparent 45%),
+    radial-gradient(circle at 95% 95%, var(--holo-d), transparent 40%),
+    linear-gradient(120deg, var(--holo-a), var(--holo-c) 60%, var(--holo-a));
+}
+
+@utility bg-qr {
+  background-color: var(--brand);
+  background-image:
+    repeating-linear-gradient(90deg, oklch(1 0 0 / 0.14) 0 3px, transparent 3px 7px),
+    repeating-linear-gradient(0deg, oklch(1 0 0 / 0.14) 0 3px, transparent 3px 9px);
+}
+
+@utility bg-sol {
+  background-image: linear-gradient(90deg, var(--sol-a), var(--sol-b));
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

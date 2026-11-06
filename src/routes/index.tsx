@@ -1,0 +1,93 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { Splash } from "@/components/venmo/Splash";
+import { Welcome } from "@/components/venmo/Welcome";
+import { Login } from "@/components/venmo/Login";
+import { Home } from "@/components/venmo/Home";
+import { SignedOut } from "@/components/venmo/SignedOut";
+import { Spinner } from "@/components/venmo/logos";
+import { supabase } from "@/integrations/supabase/client";
+
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Venmo — Pay your people" },
+      {
+        name: "description",
+        content: "Send to friends. Pay the rent. Split the bill. Make your next move with Venmo.",
+      },
+      { property: "og:title", content: "Venmo — Pay your people" },
+      {
+        property: "og:description",
+        content: "Send to friends. Pay the rent. Split the bill. Make your next move with Venmo.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: Index,
+});
+
+type Step = "splash" | "welcome" | "signedOut" | "login" | "loading" | "home";
+
+function Index() {
+  const [step, setStep] = useState<Step>("splash");
+  const [entry, setEntry] = useState<"welcome" | "signedOut">("welcome");
+  /** undefined while checking for a saved sign-in, null when nobody is signed in on this device. */
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [splashDone, setSplashDone] = useState(false);
+  const finishSplash = useCallback(() => setSplashDone(true), []);
+
+  // Stay signed in on this device until the user signs out themselves.
+  useEffect(() => {
+    let active = true;
+    void supabase.auth.getSession().then(({ data }) => {
+      if (active) setUserId(data.session?.user.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session) setUserId(session.user.id);
+      if (event === "SIGNED_OUT") {
+        setUserId(null);
+        setEntry("signedOut");
+        setStep((s) => (s === "home" || s === "loading" ? "signedOut" : s));
+      }
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (step !== "splash" || !splashDone || userId === undefined) return;
+    setStep(userId ? "home" : "welcome");
+  }, [step, splashDone, userId]);
+
+  const signOut = () => {
+    setEntry("signedOut");
+    setStep("signedOut");
+    setUserId(null);
+    void supabase.auth.signOut();
+  };
+
+  const afterLogin = (id: string) => {
+    setUserId(id);
+    setStep("loading");
+    setTimeout(() => setStep("home"), 1500);
+  };
+
+  return (
+    <main className="mx-auto h-[100dvh] w-full max-w-[430px] overflow-hidden bg-screen">
+      {step === "splash" && <Splash onDone={finishSplash} />}
+      {step === "welcome" && <Welcome onLogin={() => setStep("login")} />}
+      {step === "signedOut" && <SignedOut onLogin={() => setStep("login")} />}
+      {step === "login" && <Login onClose={() => setStep(entry)} onSuccess={afterLogin} />}
+      {step === "loading" && (
+        <div className="flex h-full items-center justify-center text-subtle">
+          <Spinner className="h-6 w-6" />
+        </div>
+      )}
+      {step === "home" && userId && <Home key={userId} userId={userId} onSignOut={signOut} />}
+    </main>
+  );
+}
