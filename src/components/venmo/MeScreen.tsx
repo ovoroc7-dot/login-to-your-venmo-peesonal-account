@@ -28,6 +28,7 @@ export function MeScreen({
   onRemindRequest,
   onDeclineRequest,
   onPayRequest,
+  onOpenTransaction,
 }: {
   balance?: number;
   transactions?: Transaction[];
@@ -41,6 +42,7 @@ export function MeScreen({
   onRemindRequest?: (r: PendingRequest) => void;
   onDeclineRequest?: (r: PendingRequest) => void;
   onPayRequest?: (r: PendingRequest) => void;
+  onOpenTransaction?: (tx: Transaction) => void;
 }) {
   const setView = (v: MeView) => onView?.(v);
   const incoming = requests.filter((r) => r.direction === "incoming").length;
@@ -150,6 +152,7 @@ export function MeScreen({
           onRemind={onRemindRequest}
           onDecline={onDeclineRequest}
           onPayRequest={onPayRequest}
+          onOpen={onOpenTransaction}
         />
       ) : (
       <>

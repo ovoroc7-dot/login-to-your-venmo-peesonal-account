@@ -18,6 +18,7 @@ import { useWallet } from "./useWallet";
 import { Spinner } from "./logos";
 import { PayRequestSheet } from "./Transactions";
 import { PrivacySheet } from "./PrivacySheet";
+import { TransactionReceipt } from "./Receipt";
 import { PrivacySettings } from "./PrivacySettings";
 import {
   completeOutgoingRequest,
@@ -26,10 +27,12 @@ import {
   newTxId,
   payIncomingRequest,
   removeRequest,
+  sendsAsPending,
   setAllPastPrivacy,
   setTransactionPrivacy,
   type PendingRequest,
   type Privacy,
+  type Transaction,
 } from "./wallet";
 
 type Screen = "tabs" | "settings" | "payment" | "pay" | "privacy";
@@ -40,7 +43,8 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
   const [screen, setScreen] = useState<Screen>("tabs");
   const [cryptoIntro, setCryptoIntro] = useState(true);
   const [overlay, setOverlay] = useState<"addMoney" | "addFunds" | "transfer" | null>(null);
-  const [sent, setSent] = useState<string | null>(null);
+  const [sent, setSent] = useState<{ name: string; pending: boolean } | null>(null);
+  const [receipt, setReceipt] = useState<Transaction | null>(null);
   const { wallet, record, update, loaded } = useWallet(userId);
   const [meView, setMeView] = useState<MeView>("Wallet");
   const [paying, setPaying] = useState<PendingRequest | null>(null);
@@ -134,7 +138,10 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
             fromBalance: payment.fromBalance,
             privacy: payment.privacy,
           });
-          setSent(p.name.split(" ")[0] ?? p.name);
+          setSent({
+            name: p.name.split(" ")[0] ?? p.name,
+            pending: sendsAsPending({ kind: "payment", cents: payment.cents }),
+          });
           setMeView("Wallet");
           setTab("Me");
           setScreen("tabs");
@@ -187,6 +194,7 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
               setNotice({ title: "Request declined", detail: `${r.counterparty}'s $${formatMoney(r.cents)} request` });
             }}
             onPayRequest={setPaying}
+            onOpenTransaction={setReceipt}
           />
         )}
         {tab === "Cards" && <CardsScreen />}
@@ -254,9 +262,16 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
             const r = paying;
             update((w) => payIncomingRequest(w, r.id, fromBalance, newTxId(), new Date().toISOString()));
             setPaying(null);
+            const held = sendsAsPending({ kind: "payment", cents: r.cents });
             setNotice({
-              title: `You paid ${r.counterparty} $${formatMoney(r.cents)}`,
-              detail: fromBalance ? "Paid from your Venmo balance" : "Paid from your bank",
+              title: held
+                ? `Your $${formatMoney(r.cents)} payment to ${r.counterparty} is pending`
+                : `You paid ${r.counterparty} $${formatMoney(r.cents)}`,
+              detail: held
+                ? "We'll notify you once it's complete"
+                : fromBalance
+                  ? "Paid from your Venmo balance"
+                  : "Paid from your bank",
             });
           }}
         />
@@ -269,7 +284,8 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
           onClose={() => setEditing(null)}
         />
       )}
-      {sent && <SentOverlay name={sent} onDone={() => setSent(null)} />}
+      {sent && <SentOverlay name={sent.name} pending={sent.pending} onDone={() => setSent(null)} />}
+      {receipt && <TransactionReceipt tx={receipt} onClose={() => setReceipt(null)} />}
 
       {/* notifications prompt */}
       {prompt && (

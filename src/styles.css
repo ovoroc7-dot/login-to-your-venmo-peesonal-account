@@ -80,6 +80,7 @@
   --color-lulu: var(--lulu);
   --color-target: var(--target);
   --color-success: var(--success);
+  --color-pending: var(--pending);
 }
 
 :root {
@@ -113,6 +114,7 @@
   --lulu: oklch(0.55 0.21 25);
   --target: oklch(0.56 0.23 27);
   --success: oklch(0.62 0.16 150);
+  --pending: oklch(0.7 0.16 65);
   --holo-a: oklch(0.8 0.12 220);
   --holo-b: oklch(0.78 0.13 320);
   --holo-c: oklch(0.82 0.11 200);
@@ -166,6 +168,15 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* The app never zooms: scrolling still works, pinch and double-tap zoom do not. */
+  *,
+  *::before,
+  *::after {
+    touch-action: pan-x pan-y;
   }
 }
 

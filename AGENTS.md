@@ -36,3 +36,5 @@ use the editor.
 - The Venmo balance, transaction history, pending requests and default privacy live in one wallet per account, stored as JSON in the `wallets` table (one row per user, own-row RLS) and synced by `useWallet(userId)`; wallet rules stay pure in `src/components/venmo/wallet.ts` and every balance change (including paid requests) goes through `applyTransaction`, so the balance never goes negative and history matches on every device.
 - Sign-in uses Lovable Cloud email/password; the session persists with auto-refresh and the app only signs out when the user taps Sign Out, so reopening on any device lands back on Home.
 - Sheets that must cover the bottom bar (pay a request, change a payment's privacy) are rendered from `Home.tsx`, because tab screens animate and trap z-index below the bar.
+- Large-payment Pending status is set inside `applyTransaction` (threshold constant in `wallet.ts`), so every send path — Pay screen and paying requests — flags it the same way.
+- Transaction receipts open from the Activity list and render from `Home.tsx` like other bar-covering sheets.

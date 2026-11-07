@@ -77,7 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
+      },
       { name: "theme-color", content: "#008CFF" },
       { title: "Venmo" },
       { name: "application-name", content: "Venmo" },
@@ -129,6 +132,32 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  // Like the native app, the screen never zooms (iPhone Safari ignores user-scalable=no, so block its pinch gestures too).
+  useEffect(() => {
+    const block = (e: Event) => e.preventDefault();
+    const pinch = (e: TouchEvent) => {
+      if (e.touches.length > 1) e.preventDefault();
+    };
+    const ctrlWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) e.preventDefault();
+    };
+    const keys = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && ["+", "-", "=", "0"].includes(e.key)) e.preventDefault();
+    };
+    document.addEventListener("gesturestart", block, { passive: false });
+    document.addEventListener("gesturechange", block, { passive: false });
+    document.addEventListener("touchmove", pinch, { passive: false });
+    window.addEventListener("wheel", ctrlWheel, { passive: false });
+    window.addEventListener("keydown", keys);
+    return () => {
+      document.removeEventListener("gesturestart", block);
+      document.removeEventListener("gesturechange", block);
+      document.removeEventListener("touchmove", pinch);
+      window.removeEventListener("wheel", ctrlWheel);
+      window.removeEventListener("keydown", keys);
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

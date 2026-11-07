@@ -24,6 +24,8 @@ export type Transaction = {
   charge?: boolean;
   /** Who can see it (payments and received money only). */
   privacy?: Privacy;
+  /** True when a large payment is still on hold (see PENDING_FROM_CENTS). The money has already left the balance. */
+  pending?: boolean;
   /** ISO date string. */
   at: string;
 };
@@ -67,6 +69,14 @@ export const STARTER_REQUESTS: PendingRequest[] = [
   },
 ];
 
+/** Payments you send of this many cents ($1,550.00) or more stay Pending instead of completing. */
+export const PENDING_FROM_CENTS = 155_000;
+
+/** True when a payment you send is large enough to be held as Pending. */
+export function sendsAsPending(tx: Pick<Transaction, "kind" | "cents">): boolean {
+  return tx.kind === "payment" && tx.cents >= PENDING_FROM_CENTS;
+}
+
 /** How much a transaction changes the Venmo balance, in cents. */
 export function balanceChange(tx: Pick<Transaction, "kind" | "cents" | "fromBalance">): number {
   if (tx.kind === "add" || tx.kind === "received") return tx.cents;
@@ -83,7 +93,8 @@ export function canApply(wallet: Wallet, tx: Pick<Transaction, "kind" | "cents" 
 /** Adds a transaction to the top of the history and updates the balance. Refused changes leave the wallet as is. */
 export function applyTransaction(wallet: Wallet, tx: Transaction): Wallet {
   if (!canApply(wallet, tx)) return wallet;
-  return { ...wallet, balance: wallet.balance + balanceChange(tx), transactions: [tx, ...wallet.transactions] };
+  const saved: Transaction = sendsAsPending(tx) ? { ...tx, pending: true } : tx;
+  return { ...wallet, balance: wallet.balance + balanceChange(tx), transactions: [saved, ...wallet.transactions] };
 }
 
 /** True when the Venmo balance covers the full payment. */

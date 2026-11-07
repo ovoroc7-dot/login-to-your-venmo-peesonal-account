@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, Check, Receipt, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Check, Clock, Receipt, X } from "lucide-react";
 import { formatMoney } from "./amount";
 import { BofaFlag, Spinner, VenmoMark } from "./logos";
 import { Avatar, people, type Person } from "./people";
@@ -22,7 +22,7 @@ function when(iso: string): string {
 
 const personFor = (name: string): Person => people.find((p) => p.name === name) ?? { name, handle: "", kind: "silhouette" };
 
-function Row({ tx }: { tx: Transaction }) {
+function Row({ tx, onOpen }: { tx: Transaction; onOpen?: (() => void) | undefined }) {
   const change = balanceChange(tx);
   const social = tx.kind === "payment" || tx.kind === "received";
   const person = social ? personFor(tx.counterparty) : undefined;
@@ -46,7 +46,12 @@ function Row({ tx }: { tx: Transaction }) {
   }
 
   return (
-    <li className="flex items-start gap-3 border-b border-border/70 px-4 py-3.5">
+    <li className="border-b border-border/70">
+      <button
+        onClick={onOpen}
+        aria-label={`View receipt: ${tx.counterparty} $${formatMoney(tx.cents)}${tx.pending ? " (pending)" : ""}`}
+        className="flex w-full items-start gap-3 px-4 py-3.5 text-left active:bg-muted"
+      >
       {person ? (
         <Avatar person={person} className="h-10 w-10" />
       ) : (
@@ -64,6 +69,14 @@ function Row({ tx }: { tx: Transaction }) {
         <span className="mt-0.5 flex items-center gap-1 text-xs text-subtle">
           {when(tx.at)}
           {tx.kind === "payment" && !tx.fromBalance ? " · Paid from bank" : ""}
+          {tx.pending && (
+            <>
+              {" · "}
+              <span className="inline-flex items-center gap-0.5 font-semibold text-pending">
+                <Clock className="h-3 w-3" strokeWidth={2.4} /> Pending
+              </span>
+            </>
+          )}
           {social && tx.privacy && (
             <>
               {" · "}
@@ -73,9 +86,12 @@ function Row({ tx }: { tx: Transaction }) {
           )}
         </span>
       </span>
-      <span className={`shrink-0 text-sm font-semibold ${change > 0 ? "text-success" : "text-foreground"}`}>
+      <span
+        className={`shrink-0 text-sm font-semibold ${tx.pending ? "text-pending" : change > 0 ? "text-success" : "text-foreground"}`}
+      >
         {change > 0 || tx.kind === "received" ? "+ " : "- "}${formatMoney(tx.cents)}
       </span>
+      </button>
     </li>
   );
 }
@@ -253,8 +269,11 @@ export function Transactions({
   onRemind,
   onDecline,
   onPayRequest,
+  onOpen,
 }: {
   transactions: Transaction[];
+  /** Opens a transaction's receipt. */
+  onOpen?: ((tx: Transaction) => void) | undefined;
   requests?: PendingRequest[];
   onCancel?: ((req: PendingRequest) => void) | undefined;
   onRemind?: ((req: PendingRequest) => void) | undefined;
@@ -297,7 +316,7 @@ export function Transactions({
           <h3 className="px-4 text-sm font-semibold text-foreground">Completed</h3>
           <ul className="mt-1">
             {transactions.map((tx) => (
-              <Row key={tx.id} tx={tx} />
+              <Row key={tx.id} tx={tx} onOpen={() => onOpen?.(tx)} />
             ))}
           </ul>
         </section>

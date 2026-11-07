@@ -1,6 +1,6 @@
-import { Check, Pencil, X } from "lucide-react";
+import { Check, Clock, Pencil, X } from "lucide-react";
 
-export function SentOverlay({ name, onDone }: { name: string; onDone: () => void }) {
+export function SentOverlay({ name, pending = false, onDone }: { name: string; pending?: boolean; onDone: () => void }) {
   return (
     <div className="absolute inset-0 z-40 flex flex-col animate-fade-soft">
       <div className="absolute inset-0 bg-scrim" aria-hidden />
@@ -9,8 +9,17 @@ export function SentOverlay({ name, onDone }: { name: string; onDone: () => void
         role="status"
         className="relative mx-6 mt-3 flex items-center gap-3 rounded-md bg-card/90 px-4 py-2 text-sm text-foreground/70 shadow animate-pop-in"
       >
-        <Check className="h-5 w-5 text-success" strokeWidth={3} />
-        You sent a payment to {name}
+        {pending ? (
+          <>
+            <Clock className="h-5 w-5 shrink-0 text-pending" strokeWidth={2.4} />
+            Your payment to {name} is pending
+          </>
+        ) : (
+          <>
+            <Check className="h-5 w-5 text-success" strokeWidth={3} />
+            You sent a payment to {name}
+          </>
+        )}
       </div>
 
       <div className="flex-1" />

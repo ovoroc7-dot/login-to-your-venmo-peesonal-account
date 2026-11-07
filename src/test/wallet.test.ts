@@ -10,6 +10,7 @@ import {
   parseWallet,
   payIncomingRequest,
   removeRequest,
+  sendsAsPending,
   setAllPastPrivacy,
   setTransactionPrivacy,
   type PendingRequest,
@@ -165,5 +166,43 @@ describe("Privacy and the feed", () => {
   it("the default privacy is Private and is remembered", () => {
     expect(parseWallet(null).defaultPrivacy).toBe("Private");
     expect(parseWallet(JSON.stringify({ ...EMPTY_WALLET, defaultPrivacy: "Friends" })).defaultPrivacy).toBe("Friends");
+  });
+});
+
+describe("Large payments stay Pending", () => {
+  it("a $1,550.00 payment is saved as Pending", () => {
+    const w = applyTransaction(withBalance(200_000), tx({ kind: "payment", cents: 155_000, fromBalance: true }));
+    expect(w.transactions[0]?.pending).toBe(true);
+  });
+
+  it("a $1,549.99 payment completes normally", () => {
+    const w = applyTransaction(withBalance(200_000), tx({ kind: "payment", cents: 154_999, fromBalance: true }));
+    expect(w.transactions[0]?.pending).toBeUndefined();
+  });
+
+  it("a pending payment's money still leaves the Venmo balance", () => {
+    const w = applyTransaction(withBalance(200_000), tx({ kind: "payment", cents: 160_000, fromBalance: true }));
+    expect(w.balance).toBe(40_000);
+  });
+
+  it("paying a friend's $2,000 request also goes Pending", () => {
+    const w = payIncomingRequest(
+      withBalance(0, { requests: [{ ...incoming, cents: 200_000 }] }),
+      "in1",
+      false,
+      "t1",
+      "2026-11-07T00:00:00.000Z",
+    );
+    expect(w.transactions[0]?.pending).toBe(true);
+  });
+
+  it("money added or received is never Pending, whatever the amount", () => {
+    expect(sendsAsPending({ kind: "add", cents: 500_000 })).toBe(false);
+    expect(sendsAsPending({ kind: "received", cents: 500_000 })).toBe(false);
+  });
+
+  it("a pending payment is still Pending after reopening the app", () => {
+    const w = applyTransaction(withBalance(200_000), tx({ kind: "payment", cents: 155_000, fromBalance: true }));
+    expect(parseWallet(JSON.stringify(w)).transactions[0]?.pending).toBe(true);
   });
 });
