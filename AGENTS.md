@@ -32,7 +32,7 @@ use the editor.
 ## Project rules
 
 - Amount and note entry use the phone's own keyboard (real inputs with the right input mode), never a drawn keypad, so the recreation behaves like the native app on phones.
-- In-app screens (splash → welcome → login → home tabs → settings → payment methods → pay/request → send money; settings sign-out → signed-out screen → login) are switched with React state in `src/routes/index.tsx` and `src/components/venmo/Home.tsx`, not separate routes, because the app mirrors a single phone recording flow.
+- In-app screens (splash → welcome → login or sign up → home tabs → settings → payment methods → pay/request → send money; settings sign-out → signed-out screen → login or create account) are switched with React state in `src/routes/index.tsx` and `src/components/venmo/Home.tsx`, not separate routes, because the app mirrors a single phone recording flow.
 - The Venmo balance, transaction history, pending requests and default privacy live in one wallet per account, stored as JSON in the `wallets` table (one row per user, own-row RLS) and synced by `useWallet(userId)`; wallet rules stay pure in `src/components/venmo/wallet.ts` and every balance change (including paid requests) goes through `applyTransaction`, so the balance never goes negative and history matches on every device.
 - Sign-in uses Lovable Cloud email/password; the session persists with auto-refresh and the app only signs out when the user taps Sign Out, so reopening on any device lands back on Home.
 - Sheets that must cover the bottom bar (pay a request, change a payment's privacy) are rendered from `Home.tsx`, because tab screens animate and trap z-index below the bar.

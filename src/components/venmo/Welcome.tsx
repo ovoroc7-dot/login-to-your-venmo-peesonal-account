@@ -1,7 +1,7 @@
 import friend from "@/assets/avatar-friend.jpg";
 import couple from "@/assets/avatar-couple.jpg";
 
-export function Welcome({ onLogin }: { onLogin: () => void }) {
+export function Welcome({ onLogin, onSignUp }: { onLogin: () => void; onSignUp?: () => void }) {
   return (
     <div className="relative flex h-full w-full flex-col bg-brand px-6 pb-8 pt-5 text-brand-foreground animate-fade-soft">
       {/* page indicator */}
@@ -62,6 +62,7 @@ export function Welcome({ onLogin }: { onLogin: () => void }) {
         </button>
         <button
           type="button"
+          onClick={onSignUp}
           className="h-14 rounded-full bg-brand-foreground text-base font-semibold text-foreground transition active:opacity-70"
         >
           Sign up

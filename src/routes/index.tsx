@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Splash } from "@/components/venmo/Splash";
 import { Welcome } from "@/components/venmo/Welcome";
 import { Login } from "@/components/venmo/Login";
+import { SignUp } from "@/components/venmo/SignUp";
 import { Home } from "@/components/venmo/Home";
 import { SignedOut } from "@/components/venmo/SignedOut";
 import { Spinner } from "@/components/venmo/logos";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Step = "splash" | "welcome" | "signedOut" | "login" | "loading" | "home";
+type Step = "splash" | "welcome" | "signedOut" | "login" | "signup" | "loading" | "home";
 
 function Index() {
   const [step, setStep] = useState<Step>("splash");
@@ -79,9 +80,14 @@ function Index() {
   return (
     <main className="mx-auto h-[100dvh] w-full max-w-[430px] overflow-hidden bg-screen">
       {step === "splash" && <Splash onDone={finishSplash} />}
-      {step === "welcome" && <Welcome onLogin={() => setStep("login")} />}
-      {step === "signedOut" && <SignedOut onLogin={() => setStep("login")} />}
+      {step === "welcome" && <Welcome onLogin={() => setStep("login")} onSignUp={() => setStep("signup")} />}
+      {step === "signedOut" && (
+        <SignedOut onLogin={() => setStep("login")} onCreate={() => setStep("signup")} />
+      )}
       {step === "login" && <Login onClose={() => setStep(entry)} onSuccess={afterLogin} />}
+      {step === "signup" && (
+        <SignUp onClose={() => setStep(entry)} onSuccess={afterLogin} onLogin={() => setStep("login")} />
+      )}
       {step === "loading" && (
         <div className="flex h-full items-center justify-center text-subtle">
           <Spinner className="h-6 w-6" />
