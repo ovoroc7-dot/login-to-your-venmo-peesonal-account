@@ -172,6 +172,14 @@
     text-size-adjust: 100%;
   }
 
+  /* Like a native app: the page itself never scrolls or bounces, only the screens inside it. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
   /* The app never zooms: scrolling still works, pinch and double-tap zoom do not. */
   *,
   *::before,
@@ -312,4 +320,37 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* The app fills the whole phone, edge to edge: the screen sits between the status bar and the
+   gesture bar, and those two strips are painted with the color of the screen's top and bottom. */
+.app-shell {
+  position: fixed;
+  inset-block: 0;
+  left: 50%;
+  width: 100%;
+  max-width: 430px;
+  transform: translateX(-50%);
+  overflow: hidden;
+  background-color: var(--color-brand);
+}
+.app-edge {
+  position: absolute;
+  inset-inline: 0;
+  pointer-events: none;
+}
+.app-edge-top {
+  top: 0;
+  height: env(safe-area-inset-top, 0px);
+}
+.app-edge-bottom {
+  bottom: 0;
+  height: env(safe-area-inset-bottom, 0px);
+}
+.app-screen {
+  position: absolute;
+  inset-inline: 0;
+  top: env(safe-area-inset-top, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  overflow: hidden;
 }

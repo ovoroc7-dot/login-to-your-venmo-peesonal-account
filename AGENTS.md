@@ -38,3 +38,4 @@ use the editor.
 - Sheets that must cover the bottom bar (pay a request, change a payment's privacy) are rendered from `Home.tsx`, because tab screens animate and trap z-index below the bar.
 - Large-payment Pending status is set inside `applyTransaction` (threshold constant in `wallet.ts`), so every send path — Pay screen and paying requests — flags it the same way.
 - Transaction receipts open from the Activity list and render from `Home.tsx` like other bar-covering sheets.
+- The app shell fills the whole phone (fixed, safe-area aware): screens sit between the status bar and gesture bar, and `useEdgeColors` paints those two strips plus the theme-color with the colors sampled at the screen's top and bottom, so every screen reaches the device edges without per-screen padding.

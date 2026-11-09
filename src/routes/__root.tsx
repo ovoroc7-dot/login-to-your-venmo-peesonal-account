@@ -11,6 +11,12 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+
+/** iPhone start-up pictures: the blue Venmo splash, so the app opens straight onto it (no icon, no white flash). */
+const LAUNCH_SCREENS: [w: number, h: number, dpr: number][] = [
+  [440, 956, 3], [402, 874, 3], [430, 932, 3], [393, 852, 3], [428, 926, 3], [390, 844, 3],
+  [375, 812, 3], [414, 896, 3], [414, 896, 2], [414, 736, 3], [375, 667, 2], [320, 568, 2],
+];
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -108,6 +114,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
       { rel: "manifest", href: "/manifest.webmanifest" },
+      ...LAUNCH_SCREENS.map(([w, h, r]) => ({
+        rel: "apple-touch-startup-image",
+        href: `/splash/launch-${w * r}x${h * r}.png`,
+        media: `(device-width: ${w}px) and (device-height: ${h}px) and (-webkit-device-pixel-ratio: ${r}) and (orientation: portrait)`,
+      })),
     ],
   }),
   shellComponent: RootShell,

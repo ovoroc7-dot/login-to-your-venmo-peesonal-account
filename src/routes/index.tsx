@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useEdgeColors } from "@/hooks/useEdgeColors";
 import { Splash } from "@/components/venmo/Splash";
 import { Welcome } from "@/components/venmo/Welcome";
 import { Login } from "@/components/venmo/Login";
@@ -38,6 +39,9 @@ function Index() {
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [splashDone, setSplashDone] = useState(false);
   const finishSplash = useCallback(() => setSplashDone(true), []);
+  const screen = useRef<HTMLDivElement>(null);
+  // The status bar and gesture bar areas take the color of whatever screen is showing.
+  const edges = useEdgeColors(screen, "#008CFF");
 
   // Stay signed in on this device until the user signs out themselves.
   useEffect(() => {
@@ -78,7 +82,10 @@ function Index() {
   };
 
   return (
-    <main className="mx-auto h-[100dvh] w-full max-w-[430px] overflow-hidden bg-screen">
+    <main className="app-shell" style={{ backgroundColor: edges.top }}>
+      <div aria-hidden className="app-edge app-edge-top" style={{ backgroundColor: edges.top }} />
+      <div aria-hidden className="app-edge app-edge-bottom" style={{ backgroundColor: edges.bottom }} />
+      <div ref={screen} className="app-screen">
       {step === "splash" && <Splash onDone={finishSplash} />}
       {step === "welcome" && <Welcome onLogin={() => setStep("login")} onSignUp={() => setStep("signup")} />}
       {step === "signedOut" && (
@@ -94,6 +101,7 @@ function Index() {
         </div>
       )}
       {step === "home" && userId && <Home key={userId} userId={userId} onSignOut={signOut} />}
+      </div>
     </main>
   );
 }
