@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Search, ScanQrCode, Heart, MessageCircle, MoreHorizontal, Globe, Users, Lock } from "lucide-react";
+import { Search, ScanQrCode, Heart, MessageCircle, MoreHorizontal, Globe, Users, Lock, Plus, Send, Landmark, X, ChevronRight } from "lucide-react";
 import matthew from "@/assets/avatar-matthew.jpg";
 import me from "@/assets/avatar-me.jpg";
 import stacy from "@/assets/avatar-stacy.jpg";
@@ -142,16 +142,60 @@ function PostRow({
   );
 }
 
+export type FirstSteps = { onAddMoney: () => void; onPay: () => void; onAddBank: () => void };
+
+/** First things to do, shown on Home until a new account makes its first transaction. */
+function GetStarted({ steps, onHide }: { steps: FirstSteps; onHide: () => void }) {
+  const items = [
+    { icon: Landmark, title: "Add a bank or card", body: "Link where your money comes from", onClick: steps.onAddBank },
+    { icon: Plus, title: "Add money to Venmo", body: "Top up your Venmo balance", onClick: steps.onAddMoney },
+    { icon: Send, title: "Pay or request a friend", body: "Find them by name, phone or email", onClick: steps.onPay },
+  ];
+  return (
+    <section aria-label="Get started" className="mx-4 mt-4 rounded-2xl bg-brand/8 p-4">
+      <div className="flex items-center">
+        <h2 className="flex-1 text-[1.05rem] font-semibold text-foreground">Get started with Venmo</h2>
+        <button aria-label="Hide get started" onClick={onHide} className="-mr-1 p-1 text-muted-foreground active:opacity-60">
+          <X className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+      </div>
+      <ul className="mt-3 space-y-2">
+        {items.map(({ icon: Icon, title, body, onClick }) => (
+          <li key={title}>
+            <button
+              onClick={onClick}
+              className="flex w-full items-center gap-3 rounded-xl bg-card px-3 py-3 text-left active:opacity-70"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand text-brand-foreground">
+                <Icon className="h-5 w-5" strokeWidth={2} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.95rem] font-medium text-foreground">{title}</span>
+                <span className="block text-xs text-muted-foreground">{body}</span>
+              </span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" strokeWidth={2} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function HomeFeed({
   transactions = [],
   onEditPrivacy,
+  firstSteps,
 }: {
   transactions?: Transaction[];
+  /** Shown to new accounts with no transactions yet. */
+  firstSteps?: FirstSteps;
   /** Opens "Who can see this?" for one of your own payments. */
   onEditPrivacy?: (txId: string, privacy: Privacy) => void;
 }) {
   const [now, setNow] = useState(() => Date.now());
   const [liked, setLiked] = useState<Set<string>>(() => new Set());
+  const [hideSteps, setHideSteps] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30_000);
@@ -200,6 +244,9 @@ export function HomeFeed({
       </div>
 
       <div className="flex-1 overflow-y-auto pb-28">
+        {firstSteps && transactions.length === 0 && !hideSteps && (
+          <GetStarted steps={firstSteps} onHide={() => setHideSteps(true)} />
+        )}
         {/* direct deposit card */}
         <div className="mx-4 mt-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
           <div className="flex-1">

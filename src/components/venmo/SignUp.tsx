@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Eye, EyeOff, Check, Globe, Users, Lock, ShieldCheck, FileText, Contact } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Check, Globe, Users, Lock, ShieldCheck, FileText, Contact, Send, Split, HandCoins } from "lucide-react";
 import { Spinner, VenmoMark, VenmoWordmark } from "./logos";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
@@ -69,7 +69,7 @@ function Field({
 
 const PRIVACY_OPTIONS: { value: Privacy; icon: typeof Globe; title: string; body: string }[] = [
   { value: "Public", icon: Globe, title: "Public", body: "Visible to everyone on the internet" },
-  { value: "Friends", icon: Users, title: "Friends", body: "Visible to the sender, recipient, and their friends" },
+  { value: "Friends", icon: Users, title: "Friends (recommended)", body: "Visible to the sender, recipient, and their friends" },
   { value: "Private", icon: Lock, title: "Private", body: "Visible to the sender and recipient only" },
 ];
 
@@ -93,7 +93,7 @@ export function SignUp({
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
   const [agree, setAgree] = useState(false);
-  const [privacy, setPrivacy] = useState<Privacy>("Private");
+  const [privacy, setPrivacy] = useState<Privacy>("Friends");
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -242,25 +242,55 @@ export function SignUp({
 
   /* ---------- Welcome onboarding ---------- */
   if (stage === "welcome") {
+    const perks = [
+      { icon: Send, title: "Pay friends in seconds", body: "Search a name, username, phone or email." },
+      { icon: Split, title: "Split the bill", body: "Request everyone's share in one go." },
+      { icon: HandCoins, title: "Get paid back", body: "Money lands right in your Venmo balance." },
+    ];
     return (
-      <div className="flex h-full w-full flex-col items-center bg-brand px-6 pb-8 pt-16 text-brand-foreground animate-fade-soft">
-        <VenmoMark className="h-16 w-16" />
-        <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <h1 className="font-display text-4xl font-semibold leading-tight tracking-display">
-            Welcome to Venmo, {first.trim()}!
-          </h1>
-          <p className="mt-4 max-w-[18rem] text-[1.05rem] font-medium leading-snug">
-            Send and receive money with friends, split bills and pay your share — all in one place.
-          </p>
-          <p className="mt-6 rounded-full bg-brand-foreground/15 px-4 py-1.5 text-sm font-semibold">@{cleanUser}</p>
+      <div className="flex h-full w-full flex-col overflow-y-auto bg-brand px-5 pb-8 pt-12 text-brand-foreground no-scrollbar animate-fade-soft">
+        <div className="flex items-center gap-2">
+          <VenmoMark className="h-9 w-9" />
+          <span className="rounded-full bg-brand-foreground/15 px-3 py-1 text-sm font-semibold">@{cleanUser}</span>
         </div>
-        <button
-          type="button"
-          onClick={() => userId && onSuccess(userId)}
-          className="h-14 w-full rounded-full bg-ink text-base font-semibold text-ink-foreground transition active:opacity-70"
-        >
-          Let's go
-        </button>
+        <h1 className="mt-10 font-display text-[2.4rem] font-semibold leading-[1.05] tracking-display">
+          You're in,
+          <br />
+          {first.trim()}.
+        </h1>
+        <p className="mt-3 max-w-[19rem] text-[1.02rem] font-medium leading-snug text-brand-foreground/85">
+          Your account is ready. Here's what you can do first.
+        </p>
+        <ul className="mt-8 space-y-3">
+          {perks.map(({ icon: Icon, title, body }, i) => (
+            <li
+              key={title}
+              className="flex items-center gap-4 rounded-2xl bg-brand-foreground/12 p-4 animate-screen-in"
+              style={{ animationDelay: `${120 + i * 90}ms`, animationFillMode: "both" }}
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-foreground text-brand">
+                <Icon className="h-5 w-5" strokeWidth={2} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[0.98rem] font-semibold">{title}</span>
+                <span className="block text-sm leading-snug text-brand-foreground/80">{body}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 flex items-center gap-2 text-sm text-brand-foreground/80">
+          {privacy === "Public" ? <Globe className="h-4 w-4" /> : privacy === "Friends" ? <Users className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+          New payments are {privacy === "Private" ? "private" : privacy === "Friends" ? "visible to friends" : "public"} — change it in Settings.
+        </p>
+        <div className="mt-auto pt-8">
+          <button
+            type="button"
+            onClick={() => userId && onSuccess(userId)}
+            className="h-14 w-full rounded-full bg-ink text-base font-semibold text-ink-foreground transition active:opacity-70"
+          >
+            Let's go
+          </button>
+        </div>
       </div>
     );
   }

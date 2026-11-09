@@ -203,6 +203,11 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
           <HomeFeed
             transactions={wallet.transactions}
             onEditPrivacy={(id, privacy) => setEditing({ id, privacy })}
+            firstSteps={{
+              onAddMoney: () => openOverlay("addMoney"),
+              onPay: () => setScreen("pay"),
+              onAddBank: () => setScreen("payment"),
+            }}
           />
         )}
       </div>
