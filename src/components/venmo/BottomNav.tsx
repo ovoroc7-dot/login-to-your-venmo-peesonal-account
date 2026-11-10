@@ -1,4 +1,4 @@
-import me from "@/assets/avatar-me.jpg";
+import { MyPhoto } from "./profilePhoto";
 import { VenmoMark } from "./logos";
 
 export type Tab = "Home" | "Cards" | "Pay/Request" | "Crypto" | "Me";
@@ -37,13 +37,7 @@ export function BottomNav({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void })
     {
       name: "Me",
       icon: (
-        <img
-          src={me}
-          alt=""
-          width={512}
-          height={512}
-          className="h-6 w-6 rounded-full object-cover ring-1 ring-brand/40"
-        />
+        <MyPhoto className="h-6 w-6" ring="ring-1 ring-brand/40" />
       ),
     },
   ];

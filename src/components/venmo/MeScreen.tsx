@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { User, ChevronDown, Bell, Settings, QrCode, MessageSquare, ChevronRight, Landmark } from "lucide-react";
-import me from "@/assets/avatar-me.jpg";
 import city from "@/assets/avatar-city.jpg";
 import tyler from "@/assets/avatar-tyler.jpg";
 import barbara from "@/assets/avatar-barbara.jpg";
 import { AppleGlyph, BofaFlag } from "./logos";
 import { Transactions } from "./Transactions";
+import { MyPhoto } from "./profilePhoto";
 import type { PendingRequest, Transaction } from "./wallet";
 
 const cards = [
@@ -29,6 +29,7 @@ export function MeScreen({
   onDeclineRequest,
   onPayRequest,
   onOpenTransaction,
+  onEditPhoto,
 }: {
   balance?: number;
   transactions?: Transaction[];
@@ -43,6 +44,7 @@ export function MeScreen({
   onDeclineRequest?: (r: PendingRequest) => void;
   onPayRequest?: (r: PendingRequest) => void;
   onOpenTransaction?: (tx: Transaction) => void;
+  onEditPhoto?: () => void;
 }) {
   const setView = (v: MeView) => onView?.(v);
   const incoming = requests.filter((r) => r.direction === "incoming").length;
@@ -86,13 +88,9 @@ export function MeScreen({
       {/* avatar */}
       <div className="relative -mt-14 flex justify-center">
         <div className="relative">
-          <img
-            src={me}
-            alt="Your profile photo"
-            width={512}
-            height={512}
-            className="h-24 w-24 rounded-full border-4 border-card object-cover shadow-sm"
-          />
+          <button onClick={onEditPhoto} aria-label="Change profile photo" className="block rounded-full active:opacity-80">
+            <MyPhoto className="h-24 w-24" ring="border-4 border-card shadow-sm" />
+          </button>
           <span className="absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-card bg-muted text-foreground">
             <QrCode className="h-4 w-4" strokeWidth={2} />
           </span>

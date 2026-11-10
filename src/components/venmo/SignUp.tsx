@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Eye, EyeOff, Check, Globe, Users, Lock, ShieldCheck, FileText, Contact, Send, Split, HandCoins } from "lucide-react";
+import { ArrowLeft, Camera, Eye, EyeOff, Check, Globe, Users, Lock, ShieldCheck, FileText, Contact, Send, Split, HandCoins } from "lucide-react";
 import { Spinner, VenmoMark, VenmoWordmark } from "./logos";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import { parseWallet, type Privacy } from "./wallet";
+import { preparePhoto, saveProfilePhoto } from "./profilePhoto";
 
 /**
  * Venmo sign-up, in the order the real app uses:
@@ -93,6 +94,8 @@ export function SignUp({
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
   const [agree, setAgree] = useState(false);
+  const [photo, setPhoto] = useState<{ blob: Blob; preview: string } | null>(null);
+  const photoInput = useRef<HTMLInputElement>(null);
   const [privacy, setPrivacy] = useState<Privacy>("Friends");
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -163,6 +166,7 @@ export function SignUp({
       const res = await supabase.auth.signInWithPassword({ email: cleanEmail, password: pw });
       id = res.data.user?.id ?? null;
     }
+    if (id && photo) await saveProfilePhoto(id, photo.blob);
     setLoading(false);
     if (!id) {
       setError("Your account was created. Please log in to continue.");
@@ -387,7 +391,47 @@ export function SignUp({
         <>
           <h1 className="mt-2 text-2xl font-bold text-foreground">Create your account</h1>
           <p className="mt-1 text-sm text-subtle">Enter your legal name as it appears on your ID.</p>
-          <div className="mt-5 space-y-3">
+          <input
+            ref={photoInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (!file) return;
+              try {
+                const blob = await preparePhoto(file);
+                if (photo) URL.revokeObjectURL(photo.preview);
+                setPhoto({ blob, preview: URL.createObjectURL(blob) });
+              } catch {
+                setError("We couldn't open that picture. Try a different one.");
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => photoInput.current?.click()}
+            aria-label={photo ? "Change profile photo" : "Upload a profile photo"}
+            className="mx-auto mt-5 flex flex-col items-center gap-2 active:opacity-70"
+          >
+            <span className="relative">
+              {photo ? (
+                <img src={photo.preview} alt="Your profile photo" className="h-24 w-24 rounded-full object-cover" />
+              ) : (
+                <span className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-dashed border-brand/60 bg-field text-brand">
+                  <Camera className="h-8 w-8" strokeWidth={1.8} />
+                </span>
+              )}
+              {photo && (
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-8 w-8 items-center justify-center rounded-full border-2 border-screen bg-brand text-brand-foreground">
+                  <Camera className="h-4 w-4" strokeWidth={2} />
+                </span>
+              )}
+            </span>
+            <span className="text-sm font-semibold text-brand">{photo ? "Change photo" : "Upload a profile photo"}</span>
+          </button>
+          <div className="mt-4 space-y-3">
             <Field
               label="Legal first name"
               value={first}

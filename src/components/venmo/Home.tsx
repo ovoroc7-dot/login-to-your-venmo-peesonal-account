@@ -20,6 +20,8 @@ import { PayRequestSheet } from "./Transactions";
 import { PrivacySheet } from "./PrivacySheet";
 import { TransactionReceipt } from "./Receipt";
 import { PrivacySettings } from "./PrivacySettings";
+import { ProfilePhotoSheet } from "./ProfilePhotoSheet";
+import { loadProfilePhoto } from "./profilePhoto";
 import {
   completeOutgoingRequest,
   createRequest,
@@ -51,6 +53,11 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
   const [editing, setEditing] = useState<{ id: string; privacy: Privacy } | null>(null);
   const balance = wallet.balance;
   const [notice, setNotice] = useState<{ title: string; detail: string } | null>(null);
+  const [photoSheet, setPhotoSheet] = useState(false);
+
+  useEffect(() => {
+    void loadProfilePhoto(userId);
+  }, [userId]);
 
   useEffect(() => {
     if (notice === null) return;
@@ -195,6 +202,7 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
             }}
             onPayRequest={setPaying}
             onOpenTransaction={setReceipt}
+            onEditPhoto={() => setPhotoSheet(true)}
           />
         )}
         {tab === "Cards" && <CardsScreen />}
@@ -291,6 +299,16 @@ export function Home({ userId, onSignOut }: { userId: string; onSignOut?: () => 
       )}
       {sent && <SentOverlay name={sent.name} pending={sent.pending} onDone={() => setSent(null)} />}
       {receipt && <TransactionReceipt tx={receipt} onClose={() => setReceipt(null)} />}
+      {photoSheet && (
+        <ProfilePhotoSheet
+          userId={userId}
+          onClose={() => setPhotoSheet(false)}
+          onDone={(title) => {
+            setPhotoSheet(false);
+            setNotice({ title, detail: "It shows on your account on every device" });
+          }}
+        />
+      )}
 
       {/* notifications prompt */}
       {prompt && (

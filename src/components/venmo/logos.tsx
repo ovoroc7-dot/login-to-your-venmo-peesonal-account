@@ -1,3 +1,4 @@
+import bofaFlag from "@/assets/bank-of-america-flag.png.asset.json";
 type Props = { className?: string; title?: string };
 
 /** Official Venmo wordmark, drawn in currentColor. */
@@ -28,17 +29,9 @@ export function VenmoMark({ className, title = "Venmo" }: Props) {
   );
 }
 
-/** Bank of America flag mark, drawn in currentColor. */
+/** Bank of America flag mark (from the official logo), shown on the bank's red tile. */
 export function BofaFlag({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 40 24" className={className} fill="currentColor" aria-label="Bank of America">
-      <path d="M21 4.5c3.6-1.5 7.4-2.4 11.4-2.5-1.3.6-2.6 1.3-3.8 2-3.3-.2-6.6.1-9.8 1.1.7-.2 1.4-.4 2.2-.6Z" />
-      <path d="M8 9.6c6.8-4.3 15-6.3 23-5.5-1.1.6-2.2 1.3-3.2 2-6.6-.2-13.2 1.4-19 4.6-.3-.4-.5-.7-.8-1.1Z" />
-      <path d="M5 14.4c7.6-5.6 17-8.5 26.5-7.8-1.1.7-2.1 1.4-3.1 2.2-7.5.1-15 2.5-21.2 6.9-.7-.4-1.5-.9-2.2-1.3Z" />
-      <path d="M10.5 18.4c6.5-5 14.5-7.9 22.7-8.2-1 .8-1.9 1.6-2.8 2.5-6.1.6-12 3-16.9 6.8-1-.4-2-.8-3-1.1Z" />
-      <path d="M17.6 21.6c4.6-3.9 10.3-6.5 16.2-7.3-.8.9-1.6 1.8-2.3 2.8-4 1-7.8 2.9-11 5.5-1-.4-1.9-.7-2.9-1Z" />
-    </svg>
-  );
+  return <img src={bofaFlag.url} alt="Bank of America" className={`${className ?? ""} object-contain`} draggable={false} />;
 }
 
 /** Huntington Bank emblem (rounded badge of vertical bars), drawn in currentColor. */

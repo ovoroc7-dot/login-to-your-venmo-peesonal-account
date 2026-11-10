@@ -13,3 +13,7 @@
 - [x] James's account (jameshannah@gmail.com) can log in
 - [x] Stay signed in until the user taps Sign Out
 - [x] Verify login → add money → reload → second device shows same history
+- [ ] Replace every Bank of America logo with the uploaded logo (nothing else changes)
+- [ ] Remove "Subject to bank/employer practices. Terms apply." line
+- [ ] Sign up: circle "Upload a profile photo" on the create-account screen; photo saved to the account
+- [ ] Profile photo shows everywhere "me" appears and can be changed anytime (Venmo profile photo flow)

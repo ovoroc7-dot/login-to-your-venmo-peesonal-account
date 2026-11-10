@@ -97,7 +97,7 @@
   --overlay: oklch(0.3 0.02 250 / 0.45);
   --teal: oklch(0.72 0.11 175);
   --bubble: oklch(0.72 0.15 250);
-  --bofa: oklch(0.55 0.21 25);
+  --bofa: oklch(0.647 0.238 27.1); /* matches the official Bank of America logo red */
   --huntington: oklch(0.6 0.16 140);
   --badge: oklch(0.55 0.2 22);
   --scrim: oklch(0.15 0.01 260 / 0.6);

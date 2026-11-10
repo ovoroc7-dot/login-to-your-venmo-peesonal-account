@@ -9,6 +9,7 @@ import promo from "@/assets/feed-promo.jpg";
 import { VenmoMark } from "./logos";
 import { formatMoney } from "./amount";
 import { Avatar, people } from "./people";
+import { MyPhoto } from "./profilePhoto";
 import { ago, storyParts } from "./story";
 import { inFeed, type Privacy, type Transaction } from "./wallet";
 
@@ -56,7 +57,7 @@ function toPost(tx: Transaction): Post {
   return {
     id: tx.id,
     txId: tx.id,
-    avatar: s.actor === "You" ? img(me) : <Avatar person={person} />,
+    avatar: s.actor === "You" ? <MyPhoto /> : <Avatar person={person} />,
     actor: s.actor,
     verb: s.verb,
     target: s.target,
@@ -203,7 +204,7 @@ export function HomeFeed({
   }, []);
 
   const mine = transactions.filter(inFeed).map(toPost);
-  const sampled: Post[] = samples.map(({ days, avatar, ...s }) => ({ ...s, verb: "paid", avatar: img(avatar), at: now - days * DAY }));
+  const sampled: Post[] = samples.map(({ days, avatar, ...s }) => ({ ...s, verb: "paid", avatar: s.actor === "You" ? <MyPhoto /> : img(avatar), at: now - days * DAY }));
   const all = [...mine, ...sampled].sort((a, b) => b.at - a.at);
   const promoAt = now - PROMO_DAYS * DAY;
   const before = all.filter((p) => p.at >= promoAt);
@@ -265,9 +266,6 @@ export function HomeFeed({
             className="h-28 w-28 shrink-0 object-contain mix-blend-multiply"
           />
         </div>
-        <p className="mt-2 px-4 text-[0.65rem] text-brand/70">
-          Subject to bank/employer practices. Terms apply.
-        </p>
 
         <div className="mt-3 divide-y divide-border">
           {before.map(row)}
