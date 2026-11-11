@@ -17,3 +17,4 @@
 - [ ] Remove "Subject to bank/employer practices. Terms apply." line
 - [ ] Sign up: circle "Upload a profile photo" on the create-account screen; photo saved to the account
 - [ ] Profile photo shows everywhere "me" appears and can be changed anytime (Venmo profile photo flow)
+- [ ] Business profile (from the two videos): create from Me tab (name, photo, cover, username → highlights + category), profile preview with tip sheet, business settings + Tipping, switch Personal ⇄ Business, business Activity / Charge / Profile tabs, charge requests with Cancel/Remind, fees 1.9% + $0.10 on money a business receives; saved in the account
