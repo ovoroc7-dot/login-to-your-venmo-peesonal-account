@@ -1,6 +1,6 @@
 /** Venmo balance, its history and pending requests, saved in the user's account so money stays until it is spent or moved out. */
 
-import { DEFAULT_TIPS, type Business } from "./business";
+import { DEFAULT_TIPS, type Business, type BusinessProfile } from "./business";
 
 /** "received" is money a friend paid you (for example when they pay your request). */
 export type TxKind = "add" | "transfer" | "payment" | "received";
@@ -250,7 +250,7 @@ const path = (v: unknown) => (typeof v === "string" && v ? v : null);
 
 function parseBusiness(v: unknown): Business | undefined {
   if (!v || typeof v !== "object") return undefined;
-  const b = v as { profile?: Record<string, unknown>; ledger?: RawLedger };
+  const b = v as { profile?: Partial<Record<keyof BusinessProfile, unknown>>; ledger?: RawLedger };
   const p = b.profile;
   if (!p || typeof p.name !== "string" || typeof p.username !== "string" || !p.name || !p.username) return undefined;
   const tips =
